@@ -1,5 +1,8 @@
 hosts: ELK
 connection: local
+vars:
+    KIBANA_USER: changeme
+    KIBANA_PASSWORD: changeme
 become: yes
   tasks:
     - name: (Java8) Install and add Repository
@@ -42,6 +45,30 @@ become: yes
         
      /** Needs Configure Section **/
      /** Needs Service Restart Section **/
+     - name: (ElasticSearch) Restart and Enable (Load on boot) Service
+        local-action:
+        module: systemd
+          name: elasticsearch
+          state: restarted
+          enabled: yes
+     - name: (Logstash) Restart and Enable (Load on boot) Service
+        local-action:
+        module: systemd
+          name: logstash
+          state: restarted
+          enabled: yes
+     - name: (Kibana) Restart and Enable (Load on boot) Service
+        local-action:
+        module: systemd
+          name: kibana
+          state: restarted
+          enabled: yes
+     - name: (NGINX) Restart and Enable (Load on boot) Service
+        local-action:
+        module: systemd
+          name: nginx
+          state: restarted
+          enabled: yes
         
     - name: (CleanUp-1) Clean up repositories that are no longer in use
       local-action:
