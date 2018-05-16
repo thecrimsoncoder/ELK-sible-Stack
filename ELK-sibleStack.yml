@@ -1,0 +1,49 @@
+hosts: ELK
+connection: local
+become: yes
+  tasks:
+    - name: (Java8) Install and add Repository
+      local-action:
+      module: apt
+        name: oracle-java8-installer
+        update-cache: yes
+        state: present
+    - name: (ElasticSearch) Install and add Repository
+      local-action:
+      module: shell
+        executable: wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+        executable: echo "deb http://packages.elastic.co/elasticsearch/2.x/debian stable main" | sudo tee -a /etc/apt/sources.list.d/elasticsearch-2.x.list
+      module: apt
+        name: elasticsearch
+        update-cache: yes
+        state: present
+    - name: (Logstash) Install and add Repository
+      local-action:
+      module: shell
+        executable: echo "deb http://packages.elastic.co/logstash/2.3/debian stable main" | sudo tee -a /etc/apt/sources.list
+      module: apt
+        name: logstash
+        update-cache: yes
+        state: present
+    - name: (Kibana) Install and add Repository
+      local-action:
+      module: shell
+        executable: echo "deb http://packages.elastic.co/kibana/4.5/debian stable main" | sudo tee -a /etc/apt/sources.list
+      module: apt
+        name: kibana
+        update-cache: yes
+        state: present
+    - name: (NGINX) Install and add Repository
+      local-action:
+      module: apt
+        name: nginx
+        update-cache: yes
+        state: present
+    - name: (CleanUp-1) Clean up repositories that are no longer in use
+      local-action:
+      module: apt
+        autoclean: yes
+    - name: (CleanUp-2) Remove up repository files that are no longer in use
+      local-action:
+      module: apt
+        autoremove: yes
