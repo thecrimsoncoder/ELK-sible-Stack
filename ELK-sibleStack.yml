@@ -3,6 +3,7 @@ connection: local
 vars:
     KIBANA_USER: changeme
     KIBANA_PASSWORD: changeme
+    USER: changeme
     
 become: yes
   tasks:
@@ -45,6 +46,13 @@ become: yes
         update-cache: yes
         state: present
     ## CONFIGURATION ##
+    - name: (Logstash) adding module config files
+      local-action:
+      module: copy
+        src: /home/"{{ "USER }}"/30-elasticsearch-output.conf
+        dest: /etc/logstash/conf.d/
+        src: /home/"{{ USER }}"/02-beats-input.conf
+        dest: /etc/logstash/conf.d/
 
     ## RESTART AND ENABLE SERVICES ##
      - name: (ElasticSearch) Restart and Enable (Load on boot) Service
