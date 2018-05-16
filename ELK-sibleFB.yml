@@ -2,6 +2,7 @@ hosts: ELK-Filebeat
 connection: local
 become: yes
   tasks:
+    ## INSTALL ##
     - name: (FileBeat) Install and add Repository
       module: shell
         executable: wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
@@ -10,9 +11,10 @@ become: yes
      name: filebeat
      update-cache: yes
      state: present
-     
-     /** Needs Configure Section **/
-     /** Needs Service Restart Section **/
+
+    ## CONFIGURATION ##
+
+    ## RESTART AND ENABLE SERVICES ##
      - name: (FileBeat) Restart and Enable (Load on boot) Service
         local-action:
         module: systemd
@@ -28,4 +30,3 @@ become: yes
       local-action:
       module: apt
         autoremove: yes
-        

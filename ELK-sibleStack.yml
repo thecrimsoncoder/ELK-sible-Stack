@@ -3,8 +3,10 @@ connection: local
 vars:
     KIBANA_USER: changeme
     KIBANA_PASSWORD: changeme
+    
 become: yes
   tasks:
+    ## INSTALL ##
     - name: (Java8) Install and add Repository
       local-action:
       module: apt
@@ -42,9 +44,9 @@ become: yes
         name: nginx
         update-cache: yes
         state: present
-        
-     /** Needs Configure Section **/
-     /** Needs Service Restart Section **/
+    ## CONFIGURATION ##
+
+    ## RESTART AND ENABLE SERVICES ##
      - name: (ElasticSearch) Restart and Enable (Load on boot) Service
         local-action:
         module: systemd
@@ -69,7 +71,8 @@ become: yes
           name: nginx
           state: restarted
           enabled: yes
-        
+
+    ## CLEANUP ##
     - name: (CleanUp-1) Clean up repositories that are no longer in use
       local-action:
       module: apt
