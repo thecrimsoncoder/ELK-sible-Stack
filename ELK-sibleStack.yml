@@ -39,6 +39,10 @@ become: yes
         name: nginx
         update-cache: yes
         state: present
+        
+     /** Needs Configure Section **/
+     /** Needs Service Restart Section **/
+        
     - name: (CleanUp-1) Clean up repositories that are no longer in use
       local-action:
       module: apt

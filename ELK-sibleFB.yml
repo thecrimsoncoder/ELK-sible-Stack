@@ -2,11 +2,24 @@ hosts: ELK-Filebeat
 connection: local
 become: yes
   tasks:
-  - name: (FileBeat) Install and add Repository
-    module: shell
-      executable: wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
-      executable: echo "deb https://packages.elastic.co/beats/apt stable main" |  sudo tee -a /etc/apt/sources.list.d/beats.list
-    module: apt
+    - name: (FileBeat) Install and add Repository
+      module: shell
+        executable: wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+        executable: echo "deb https://packages.elastic.co/beats/apt stable main" |  sudo tee -a /etc/apt/sources.list.d/beats.list
+      module: apt
      name: filebeat
      update-cache: yes
      state: present
+     
+     /** Needs Configure Section **/
+     /** Needs Service Restart Section **/
+     
+    - name: (CleanUp-1) Clean up repositories that are no longer in use
+      local-action:
+      module: apt
+        autoclean: yes
+    - name: (CleanUp-2) Remove up repository files that are no longer in use
+      local-action:
+      module: apt
+        autoremove: yes
+        
