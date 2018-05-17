@@ -4,6 +4,7 @@ vars:
     KIBANA_USER: changeme
     KIBANA_PASSWORD: changeme
     USER: changeme
+    SERVER_NAME: changeme
     
 become: yes
   tasks:
@@ -45,6 +46,12 @@ become: yes
         name: nginx
         update-cache: yes
         state: present
+    - name: (NGINX-Apache2-Utils) Install and add Repository
+      local-action:
+      module: apt
+        name: apache2-utils
+        update-cache: yes
+        state: present
     ## CONFIGURATION ##
     - name: (Logstash) adding module config files
       local-action:
@@ -53,7 +60,39 @@ become: yes
         dest: /etc/logstash/conf.d/
         src: /home/"{{ USER }}"/02-beats-input.conf
         dest: /etc/logstash/conf.d/
-
+    - name: (ElasticSearch) Modify elasticsearch.yml config
+      local-action:
+      module: lineinfile
+        path: /etc/elasticsearch/elasticsearch.yml
+        regexp: '# network.host: localhost'
+        line: 'network.host: localhost'
+    - name: (Kibana) Modify kibana.yml config
+      local-action:
+      module: lineinfile
+        path: /opt/kibana/config/kibana.yml
+        regexp: 'server.host: 0.0.0.0'
+        line: 'server.host: localhost'
+    - name: (NGINX) add config file (default)
+      local-action:
+      module: copy
+        src: /home/"{{ USER }}"/default
+        dest: /etc/nginx/sites-available/
+    - name: (NGINX) modify sites-available config
+      local-action:
+      module: lineinfile
+        path: /etc/nginx/sites-available/default
+        regexp: 'server_name: changeme'
+        line: 'server_name: "{{ SERVER_NAME }}"'
+    - name: (NGINX) Add kibana user
+      local-action:
+      module: shell
+        executable: sudo htpasswd -c /etc/nginx/htpasswd.users “{{ KIBANA_USER }}” “{{ KIBANA_PASSWORD }}”
+    - name: (SSL) create SSL cert folders
+      local-action:
+      module: file
+        path: /etc/pki/tls/certs
+        path: /etc/pki/tls/private
+     
     ## RESTART AND ENABLE SERVICES ##
      - name: (ElasticSearch) Restart and Enable (Load on boot) Service
         local-action:
